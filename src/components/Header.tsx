@@ -1,67 +1,82 @@
-import { Link } from '@tanstack/react-router'
+import { type FC } from 'react'
+import { cn } from '@/lib/utils'
+import { Link, useRouterState } from '@tanstack/react-router'
+import { Button } from './ui/button'
 
-import { useState } from 'react'
-import { Home, Menu, X } from 'lucide-react'
+type NavItem = { pageUrl: string; pageName: string }
+const NavItems: NavItem[] = [
+  {
+    pageUrl: '/about',
+    pageName: 'About',
+  },
+  {
+    pageUrl: '/account/login',
+    pageName: 'Login/Register',
+  },
+  {
+    pageUrl: '/public-data',
+    pageName: 'Public Data',
+  },
+  {
+    pageUrl: '/get-started',
+    pageName: 'Get Started',
+  },
+  {
+    pageUrl: '/support',
+    pageName: 'Support',
+  },
+]
 
-export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-
+export function Header() {
   return (
-    <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
-          </Link>
-        </h1>
-      </header>
+    <nav className="fixed left-10 right-0 top-2 z-100 h-fit py-2 backdrop-blur-sm">
+      <div className="flex w-screen grid grid-flow-col justify-items-center">
+        <Link to="/" className="flex  gap-6 justify-self-start">
+          <img
+            src={'/elixir-no-logo-black.svg'}
+            alt={'Elixir Logo'}
+            width={90}
+            height={45.55}
+          />
 
-      <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Navigation</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            aria-label="Close menu"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex flex-col justify-center">
+            <h1 className="animate-fade-in text-4xl font-bold lg:text-3xl">
+              Norwegian Microbial Data Platform
+            </h1>
+            <h4 className="animate-fade-in text-lg lg:text-lg">
+              Manage, share and archive data
+            </h4>
+          </div>
+        </Link>
+
+        <div className="flex flex-row items-center gap-x-4 pb-4 justify-self-center">
+          <ul className="flex flex-row items-center gap-x-4">
+            {NavItems.map((it) => (
+              <NavBarItem
+                key={it.pageName}
+                pageUrl={it.pageUrl}
+                pageName={it.pageName}
+              />
+            ))}
+          </ul>
         </div>
+      </div>
+    </nav>
+  )
+}
 
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <Link
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Home size={20} />
-            <span className="font-medium">Home</span>
-          </Link>
-
-          {/* Demo Links Start */}
-
-          {/* Demo Links End */}
-        </nav>
-      </aside>
-    </>
+const NavBarItem: FC<NavItem> = ({ pageUrl, pageName }) => {
+  const selected = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+  const pathName = selected
+  return (
+    <Button
+      asChild
+      className={cn('text-md', 'h-10 rounded-md px-4 has-[>svg]:px-4')}
+      variant={pathName === pageUrl ? 'default' : 'secondary'}
+    >
+      <a href={pageUrl}>{pageName}</a>
+    </Button>
   )
 }
