@@ -1,10 +1,10 @@
-import { type FC } from 'react'
-import { cn } from '@/lib/utils'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Button } from './ui/button'
+import type { FC } from 'react'
+import { cn } from '@/lib/utils'
 
 type NavItem = { pageUrl: string; pageName: string }
-const NavItems: NavItem[] = [
+const NavItems: Array<NavItem> = [
   {
     pageUrl: '/about',
     pageName: 'About',
@@ -22,8 +22,8 @@ const NavItems: NavItem[] = [
     pageName: 'Get Started',
   },
   {
-    pageUrl: '/support',
-    pageName: 'Support',
+    pageUrl: '/contact-us',
+    pageName: 'Contact Us',
   },
 ]
 

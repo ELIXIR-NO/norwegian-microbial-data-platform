@@ -95,8 +95,8 @@ const Links = () => {
         <Link to="/get-started" className="text-sm leading-6">
           Get Started
         </Link>
-        <Link to="/support" className="text-sm leading-6">
-          Support
+        <Link to="/contact-us" className="text-sm leading-6">
+          Contact Us
         </Link>
       </div>
     </div>
