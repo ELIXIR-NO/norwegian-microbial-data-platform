@@ -1,3 +1,4 @@
+import { Separator } from './ui/separator'
 import {
   Card,
   CardContent,
@@ -6,11 +7,9 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Separator } from './ui/separator'
 
 export type ResourcesGridData = {
   title: string
-  description: string
   image: string
   link: string
 }
@@ -19,7 +18,7 @@ export default function ResourcesGrid({
   data,
   className = '',
 }: {
-  data: ResourcesGridData[]
+  data: Array<ResourcesGridData>
   className?: string
 }) {
   return (
@@ -48,16 +47,13 @@ export default function ResourcesGrid({
             </CardHeader>
             <Separator className="h-2px" />
             <CardContent className="flex flex-col justify-center space-y-6 text-center">
-              <div className="w-full h-60 overflow-hidden rounded-lg">
+              <div className="w-full h-40 overflow-hidden rounded-lg">
                 <img
                   src={item.image}
                   alt={item.title}
                   className="h-full w-full object-scale-down"
                 />
               </div>
-              <p className="text-sm whitespace-break-spaces">
-                {item.description}
-              </p>
             </CardContent>
           </a>
         </Card>
