@@ -1,16 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/about/')({
-  component: About,
-})
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Suspense } from 'react'
 import What from './what'
 import Behind from './behind'
 import Funding from './funding'
 import Who from './who'
 import Why from './why'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+export const Route = createFileRoute('/about/')({
+  component: About,
+})
 
 export default function About() {
   return (

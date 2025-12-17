@@ -1,12 +1,12 @@
 import { Check } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface CheckItemProps {
   title?: string
   description?: string
 }
 
-const checkItems: CheckItemProps[] = [
+const checkItems: Array<CheckItemProps> = [
   {
     title: 'Secure data storage',
     description:

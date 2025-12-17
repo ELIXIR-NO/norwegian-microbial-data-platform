@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import {
   Card,
   CardContent,
@@ -6,7 +7,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Link } from '@tanstack/react-router'
 
 export type CardGridData = {
   title: string
@@ -19,7 +19,7 @@ export default function CardGrid({
   data,
   className = '',
 }: {
-  data: CardGridData[]
+  data: Array<CardGridData>
   className?: string
 }) {
   return (
@@ -36,7 +36,7 @@ export default function CardGrid({
         >
           <Link to="/" className="flex h-full flex-col">
             <CardContent className="flex flex-col justify-center space-y-6 text-center">
-              <div className="w-full h-60 overflow-hidden rounded-lg">
+              <div className="w-full h-50 overflow-hidden rounded-lg">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -44,10 +44,10 @@ export default function CardGrid({
                 />
               </div>
               <CardHeader>
-                <CardTitle className="text-lg">{item.title}</CardTitle>
+                <CardTitle className="text-xl">{item.title}</CardTitle>
                 <CardDescription></CardDescription>
               </CardHeader>
-              <p className="text-sm whitespace-break-spaces">
+              <p className="text-base whitespace-break-spaces">
                 {item.description}
               </p>
             </CardContent>

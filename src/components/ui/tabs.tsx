@@ -2,10 +2,11 @@
 
 import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
+import { useLocation, useNavigate } from '@tanstack/react-router'
+import type { VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
-import { useNavigate, useLocation } from '@tanstack/react-router'
 
 const Tabs = TabsPrimitive.Root
 
