@@ -1,16 +1,17 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { BookOpen, CircleQuestionMark, FolderInput } from 'lucide-react'
 import type { CardGridData } from '@/components/card-grid'
+import type { ResourcesGridData } from '@/components/resources-grid'
 import CardGrid from '@/components/card-grid'
 import { QuickStartCard } from '@/components/quick-start'
 import ResourcesGrid from '@/components/resources-grid'
 import { SearchData } from '@/components/search-data'
-import { createFileRoute } from '@tanstack/react-router'
-import { BookOpen, CircleQuestionMark, FolderInput } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
-const organism: CardGridData[] = [
+const organism: Array<CardGridData> = [
   {
     title: 'Bacteria',
     description: '150 Samples\n 27 Species',
@@ -37,34 +38,29 @@ const organism: CardGridData[] = [
   },
 ]
 
-const resources: CardGridData[] = [
+const resources: Array<ResourcesGridData> = [
   {
     title: 'DATA MANAGEMENT PLAN',
-    description: '150 Samples\n 27 Species',
     link: 'https://elixir.no/services/dsw',
     image: '/dsw.png',
   },
   {
     title: 'METADATA MANAGEMENT',
-    description: '120 Samples\n 11 Species',
     link: 'https://norway.dsw.elixir-europe.org/wizard/',
     image: '/metatrack-logo.svg',
   },
   {
     title: 'DATA STORAGE',
-    description: '1050 Sample\n 31 Species',
     link: 'https://nels.bioinfo.no',
     image: 'nels.png',
   },
   {
     title: 'PATHOGENS PORTAL',
-    description: '2240 Samples',
     link: 'https://www.pathogens.nos',
     image: 'pathogens_logo-white.png',
   },
   {
     title: 'DATA ANALYSIS',
-    description: '2240 Samples',
     link: 'https://usegalaxy.org',
     image: 'galaxy.png',
   },
@@ -73,7 +69,7 @@ const resources: CardGridData[] = [
 function App() {
   return (
     <div className="flex flex-col items-center space-y-8 py-25">
-      <section className="relative flex lg:h-70 sm:h-120 w-full items-center justify-center overflow-hidden">
+      <section className="relative flex lg:h-80 sm:h-120 w-full items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-[#1f283a] dark:bg-black/40" />
 
         <div className="z-10 flex h-full w-full flex-col justify-between px-6 py-2">
