@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Suspense } from 'react'
-import What from './what'
-import Behind from './behind'
-import Funding from './funding'
-import Who from './who'
-import Why from './why'
+import What from '../../components/about/what'
+import Behind from '../../components/about/behind'
+import Funding from '../../components/about/funding'
+import Who from '../../components/about/who'
+import Why from '../../components/about/why'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Route = createFileRoute('/about/')({
