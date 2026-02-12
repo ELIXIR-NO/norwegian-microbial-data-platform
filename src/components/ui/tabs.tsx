@@ -173,7 +173,7 @@ const TabsWithUrlSync: React.FC<TabsUrlSyncProps> = ({
     navigate({
       to: location.pathname,
       search: {
-        ...searchParams,
+        ...Object.fromEntries(searchParams.entries()),
         [urlParamName]: newValue,
       },
       replace: true,
