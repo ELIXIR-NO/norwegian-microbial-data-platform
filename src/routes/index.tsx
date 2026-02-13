@@ -14,25 +14,25 @@ export const Route = createFileRoute('/')({
 const organism: Array<CardGridData> = [
   {
     title: 'Bacteria',
-    description: '150 Samples\n 27 Species',
+    description: '',
     link: '/',
     image: '/bacteria.jpg',
   },
   {
     title: 'Virus',
-    description: '120 Samples\n 11 Species',
+    description: '',
     link: '/',
     image: '/virus.jpg',
   },
   {
     title: 'Eukaryote',
-    description: '1050 Sample\n 31 Species',
+    description: '',
     link: '/',
     image: 'eukaryote.jpg',
   },
   {
     title: 'Other',
-    description: '2240 Samples',
+    description: '',
     link: '/',
     image: 'microscope.jpg',
   },
