@@ -46,7 +46,7 @@ const resources: Array<ResourcesGridData> = [
   },
   {
     title: 'METADATA MANAGEMENT',
-    link: 'https://norway.dsw.elixir-europe.org/wizard/',
+    link: 'https://www.metatrack.no',
     image: '/metatrack-logo.svg',
   },
   {
