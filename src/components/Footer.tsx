@@ -98,6 +98,12 @@ const Links = () => {
         <Link to="/contact-us" className="text-sm leading-6">
           Contact Us
         </Link>
+        <Link to="/privacy-policy" className="text-sm leading-6">
+          Privacy Policy
+        </Link>
+        <Link to="/terms-of-use" className="text-sm leading-6">
+          Terms Of Use
+        </Link>
       </div>
     </div>
   )

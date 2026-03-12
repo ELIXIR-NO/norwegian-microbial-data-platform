@@ -9,13 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as PublicDataRouteImport } from './routes/public-data'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactUsIndexRouteImport } from './routes/contact-us/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 
+const TermsOfUseRoute = TermsOfUseRouteImport.update({
+  id: '/terms-of-use',
+  path: '/terms-of-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -24,6 +31,11 @@ const SearchRoute = SearchRouteImport.update({
 const PublicDataRoute = PublicDataRouteImport.update({
   id: '/public-data',
   path: '/public-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GetStartedRoute = GetStartedRouteImport.update({
@@ -50,16 +62,20 @@ const AboutIndexRoute = AboutIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/public-data': typeof PublicDataRoute
   '/search': typeof SearchRoute
+  '/terms-of-use': typeof TermsOfUseRoute
   '/about': typeof AboutIndexRoute
   '/contact-us': typeof ContactUsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/public-data': typeof PublicDataRoute
   '/search': typeof SearchRoute
+  '/terms-of-use': typeof TermsOfUseRoute
   '/about': typeof AboutIndexRoute
   '/contact-us': typeof ContactUsIndexRoute
 }
@@ -67,8 +83,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/public-data': typeof PublicDataRoute
   '/search': typeof SearchRoute
+  '/terms-of-use': typeof TermsOfUseRoute
   '/about/': typeof AboutIndexRoute
   '/contact-us/': typeof ContactUsIndexRoute
 }
@@ -77,24 +95,30 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/get-started'
+    | '/privacy-policy'
     | '/public-data'
     | '/search'
+    | '/terms-of-use'
     | '/about'
     | '/contact-us'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/get-started'
+    | '/privacy-policy'
     | '/public-data'
     | '/search'
+    | '/terms-of-use'
     | '/about'
     | '/contact-us'
   id:
     | '__root__'
     | '/'
     | '/get-started'
+    | '/privacy-policy'
     | '/public-data'
     | '/search'
+    | '/terms-of-use'
     | '/about/'
     | '/contact-us/'
   fileRoutesById: FileRoutesById
@@ -102,14 +126,23 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GetStartedRoute: typeof GetStartedRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   PublicDataRoute: typeof PublicDataRoute
   SearchRoute: typeof SearchRoute
+  TermsOfUseRoute: typeof TermsOfUseRoute
   AboutIndexRoute: typeof AboutIndexRoute
   ContactUsIndexRoute: typeof ContactUsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms-of-use': {
+      id: '/terms-of-use'
+      path: '/terms-of-use'
+      fullPath: '/terms-of-use'
+      preLoaderRoute: typeof TermsOfUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -122,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/public-data'
       fullPath: '/public-data'
       preLoaderRoute: typeof PublicDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/get-started': {
@@ -158,8 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GetStartedRoute: GetStartedRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   PublicDataRoute: PublicDataRoute,
   SearchRoute: SearchRoute,
+  TermsOfUseRoute: TermsOfUseRoute,
   AboutIndexRoute: AboutIndexRoute,
   ContactUsIndexRoute: ContactUsIndexRoute,
 }
