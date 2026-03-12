@@ -135,7 +135,6 @@ const TabsWithUrlSync: React.FC<TabsUrlSyncProps> = ({
 
   const [value, setValue] = React.useState(defaultValue)
 
-  // Sincroniza tab com URL
   React.useEffect(() => {
     const tabFromUrl = searchParams.get(urlParamName)
 
