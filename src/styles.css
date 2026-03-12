@@ -133,5 +133,21 @@ code {
   }
   body {
     @apply bg-background text-foreground;
+
+    h1 {
+      @apply text-[58px];
+    }
+    h2 {
+      @apply text-[44px];
+    }
+    h3 {
+      @apply text-[32px];
+    }
+    h4 {
+      @apply text-[24px];
+    }
+    h5 {
+      @apply text-[20px];
+    }
   }
 }
