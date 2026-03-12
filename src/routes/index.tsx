@@ -89,18 +89,22 @@ function App() {
                 'Learn how to navigate the platform',
                 'and start managing your metadata',
               ]}
+              href="/get-started"
             />
 
             <QuickStartCard
               icon={<FolderInput size={35} className="text-white" />}
               title="Manage in MetaTrack"
               lines={['Manage your metadata', 'systematically']}
+              href="https://www.metatrack.no"
+              newTab
             />
 
             <QuickStartCard
               icon={<CircleQuestionMark size={35} className="text-white" />}
               title="ELIXIR Support"
               lines={['Connect with', 'ELIXIR Norway support']}
+              href="mailto:support@elixir.no"
             />
           </div>
         </div>
