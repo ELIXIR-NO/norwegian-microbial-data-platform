@@ -89,9 +89,6 @@ const Links = () => {
         <Link to="/" className="text-sm leading-6">
           Login/Register
         </Link>
-        <Link to="/public-data" className="text-sm leading-6">
-          Public Data
-        </Link>
         <Link to="/get-started" className="text-sm leading-6">
           Get Started
         </Link>
