@@ -51,12 +51,12 @@ const resources: Array<ResourcesGridData> = [
   },
   {
     title: 'DATA STORAGE',
-    link: 'https://nels.bioinfo.no',
+    link: 'https://nels.elixir.no/nels-web',
     image: 'nels.png',
   },
   {
     title: 'PATHOGENS PORTAL',
-    link: 'https://www.pathogens.nos',
+    link: 'https://www.pathogens.no',
     image: 'pathogens_logo-white.png',
   },
   {
