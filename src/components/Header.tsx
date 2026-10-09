@@ -6,16 +6,12 @@ import { cn } from '@/lib/utils'
 type NavItem = { pageUrl: string; pageName: string }
 const NavItems: Array<NavItem> = [
   {
+    pageUrl: '/managed-data',
+    pageName: 'Managed Data',
+  },
+  {
     pageUrl: '/about',
     pageName: 'About',
-  },
-  {
-    pageUrl: '/account/login',
-    pageName: 'Login/Register',
-  },
-  {
-    pageUrl: '/public-data',
-    pageName: 'Public Data',
   },
   {
     pageUrl: '/get-started',
@@ -66,15 +62,17 @@ export function Header() {
 }
 
 const NavBarItem: FC<NavItem> = ({ pageUrl, pageName }) => {
-  const selected = useRouterState({
+  const pathName = useRouterState({
     select: (state) => state.location.pathname,
   })
-  const pathName = selected
+
+  const isActive = pathName === pageUrl
+
   return (
     <Button
       asChild
-      className={cn('text-md', 'h-10 rounded-md px-4 has-[>svg]:px-4')}
-      variant={pathName === pageUrl ? 'default' : 'secondary'}
+      className={cn('text-md h-10 rounded-md px-4 has-[>svg]:px-4')}
+      variant={isActive ? 'default' : 'secondary'}
     >
       <a href={pageUrl}>{pageName}</a>
     </Button>

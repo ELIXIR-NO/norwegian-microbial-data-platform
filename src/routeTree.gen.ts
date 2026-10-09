@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as PublicDataRouteImport } from './routes/public-data'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as ManagedDataRouteImport } from './routes/managed-data'
 import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactUsIndexRouteImport } from './routes/contact-us/index'
@@ -28,14 +29,19 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicDataRoute = PublicDataRouteImport.update({
-  id: '/public-data',
-  path: '/public-data',
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagedDataRoute = ManagedDataRouteImport.update({
+  id: '/managed-data',
+  path: '/managed-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GetStartedRoute = GetStartedRouteImport.update({
@@ -62,8 +68,9 @@ const AboutIndexRoute = AboutIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/managed-data': typeof ManagedDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
-  '/public-data': typeof PublicDataRoute
+  '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/about': typeof AboutIndexRoute
@@ -72,8 +79,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/managed-data': typeof ManagedDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
-  '/public-data': typeof PublicDataRoute
+  '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/about': typeof AboutIndexRoute
@@ -83,8 +91,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
+  '/managed-data': typeof ManagedDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
-  '/public-data': typeof PublicDataRoute
+  '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
   '/about/': typeof AboutIndexRoute
@@ -95,8 +104,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/get-started'
+    | '/managed-data'
     | '/privacy-policy'
-    | '/public-data'
+    | '/resources'
     | '/search'
     | '/terms-of-use'
     | '/about'
@@ -105,8 +115,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/get-started'
+    | '/managed-data'
     | '/privacy-policy'
-    | '/public-data'
+    | '/resources'
     | '/search'
     | '/terms-of-use'
     | '/about'
@@ -115,8 +126,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/get-started'
+    | '/managed-data'
     | '/privacy-policy'
-    | '/public-data'
+    | '/resources'
     | '/search'
     | '/terms-of-use'
     | '/about/'
@@ -126,8 +138,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GetStartedRoute: typeof GetStartedRoute
+  ManagedDataRoute: typeof ManagedDataRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
-  PublicDataRoute: typeof PublicDataRoute
+  ResourcesRoute: typeof ResourcesRoute
   SearchRoute: typeof SearchRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
   AboutIndexRoute: typeof AboutIndexRoute
@@ -150,11 +163,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/public-data': {
-      id: '/public-data'
-      path: '/public-data'
-      fullPath: '/public-data'
-      preLoaderRoute: typeof PublicDataRouteImport
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy-policy'
       fullPath: '/privacy-policy'
       preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/managed-data': {
+      id: '/managed-data'
+      path: '/managed-data'
+      fullPath: '/managed-data'
+      preLoaderRoute: typeof ManagedDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/get-started': {
@@ -198,8 +218,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GetStartedRoute: GetStartedRoute,
+  ManagedDataRoute: ManagedDataRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
-  PublicDataRoute: PublicDataRoute,
+  ResourcesRoute: ResourcesRoute,
   SearchRoute: SearchRoute,
   TermsOfUseRoute: TermsOfUseRoute,
   AboutIndexRoute: AboutIndexRoute,
