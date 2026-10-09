@@ -96,7 +96,7 @@ function App() {
               icon={<FolderInput size={35} className="text-white" />}
               title="Manage in MetaTrack"
               lines={['Manage your metadata', 'systematically']}
-              href="https://www.metatrack.no"
+              href="https://www.metatrack.no/login"
               newTab
             />
 
