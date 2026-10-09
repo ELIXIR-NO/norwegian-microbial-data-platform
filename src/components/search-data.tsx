@@ -116,7 +116,7 @@ export function SearchData() {
             <BsInfoCircleFill size={36} color="#1f283a" />
           </TooltipTrigger>
           <TooltipContent className="bg-secondary text-primary [&_svg]:hidden!">
-            <h1 className="font-bold">Discover pre-published metadata</h1>
+            <h2 className="font-bold">Discover pre-published metadata</h2>
             <p className="leading-relaxed">
               Part of the contextual metadata for all data sets in NMDP is
               exposed.
