@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { CircleHelp } from 'lucide-react'
 
 export const Route = createFileRoute('/managed-data')({
   component: ManagedData,
