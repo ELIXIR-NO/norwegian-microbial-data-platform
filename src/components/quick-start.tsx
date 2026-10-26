@@ -1,4 +1,4 @@
-import { BookOpen, Fingerprint, FolderInput } from 'lucide-react'
+import { BookOpen, FolderInput } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function QuickStart() {
