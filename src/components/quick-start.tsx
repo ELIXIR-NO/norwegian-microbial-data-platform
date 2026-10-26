@@ -1,53 +1,38 @@
-import type { FC, ReactNode } from 'react'
+import { BookOpen, Fingerprint, FolderInput } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
-interface QuickStartCardProps {
-  icon: ReactNode
-  title: string
-  lines: Array<string>
-  href: string
-  newTab?: boolean
-}
-
-export const QuickStartCard: FC<QuickStartCardProps> = ({
-  icon,
-  title,
-  lines,
-  href,
-  newTab = false,
-}) => {
+export default function QuickStart() {
   return (
-    <a
-      href={href}
-      target={newTab ? '_blank' : '_self'}
-      rel={newTab ? 'noopener noreferrer' : undefined}
-      className="block"
-    >
-      <div
-        className={cn(
-          'flex flex-col items-center gap-6',
-          'rounded-xl border border-white/20 bg-white/10 p-2 text-white backdrop-blur-md',
-          'transition duration-300 hover:bg-white/20',
-          'w-[220px] sm:w-[240px] md:w-[260px] xl:w-[250px]',
-          'h-[180px]',
-          'cursor-pointer',
-        )}
-      >
+    <div className="mx-auto flex w-full max-w-[1200px] flex-wrap justify-center gap-[6vw]">
+      {/* Card 1 */}
+      <div className="bg-secondary hover:bg-secondary/80 flex h-36 w-36 flex-col items-center justify-center gap-6 rounded-xl border border-white/20 p-6 backdrop-blur-md transition duration-300">
         <div className="flex flex-col items-center gap-4 transition-transform duration-300 hover:-translate-y-1 hover:scale-105">
-          {icon}
-
-          <Button className="h-9 rounded-sm bg-white/20 px-4 text-white text-lg hover:bg-white/30">
-            {title}
+          <BookOpen size={60} />
+          <Button
+            className="hover:bg-secondary/0 bg-secondary/0 h-6 rounded-lg px-6"
+            variant="secondary"
+          >
+            GET STARTED
           </Button>
-
-          {lines.map((text, i) => (
-            <p key={i} className="text-center leading-tight text-sm">
-              {text}
-            </p>
-          ))}
         </div>
       </div>
-    </a>
+
+      {/* Card 2 */}
+      <a href="https://www.metatrack.no/login">
+        <div className="bg-secondary hover:bg-secondary/80 flex h-36 w-36 flex-col items-center justify-center gap-6 rounded-xl border border-white/20 p-6 backdrop-blur-md transition duration-300">
+          <div className="flex flex-col items-center gap-4 transition-transform duration-300 hover:-translate-y-1 hover:scale-105">
+            <FolderInput size={60} />
+            <Button
+              className="hover:bg-secondary/0 bg-secondary/0 h-6 rounded-lg px-6"
+              variant="secondary"
+            >
+              MANAGE IN {'\n'}
+              <br />
+              METATRACK
+            </Button>
+          </div>
+        </div>
+      </a>
+    </div>
   )
 }
