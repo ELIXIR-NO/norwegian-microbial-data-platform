@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ChevronDown, Search, Info, Ghost } from 'lucide-react'
+import { ChevronDown, Search, Info } from 'lucide-react'
 
 import { Label } from './ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -27,12 +27,6 @@ import {
 } from './ui/select'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTaxon } from '@/lib/api/samples'
-
-const SPECIES_LIST = [
-  'Escherichia coli',
-  'Staphylococcus aureus',
-  'Pseudomonas aeruginosa',
-]
 
 export function SearchData() {
   const [query, setQuery] = useState('')
