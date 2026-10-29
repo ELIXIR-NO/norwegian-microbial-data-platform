@@ -26,12 +26,21 @@ import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/data-table'
 import { columns } from '@/routes/search/columns'
 
+const UNKNOWN_SPECIES = '__unknown_species__'
+const UNKNOWN_ORGANIZATION = '__unknown_organization__'
+const UNKNOWN_HOST = '__unknown_host__'
+const UNKNOWN_YEAR = '__unknown_year__'
+const UNKNOWN_ISOLATION_SOURCE = '__unknown_isolation_source__'
+
 export const Route = createFileRoute('/search')({
   component: RouteComponent,
   validateSearch: z.object({
     query: z.string().optional(),
     species: z.array(z.string()).optional(),
     organization: z.string().optional(),
+    host: z.array(z.string()).optional(),
+    collectionYear: z.array(z.string()).optional(),
+    isolationSource: z.array(z.string()).optional(),
   }),
 })
 
@@ -53,19 +62,23 @@ function RouteComponent() {
 
   const speciesOptions = useMemo(() => {
     const speciesMap = new Map<
-      number,
-      { taxId: number; name: string; count: number }
+      string,
+      { value: string; taxId: number | null; name: string; count: number }
     >()
 
     for (const sample of samples) {
-      const existing = speciesMap.get(sample.taxId)
+      const hasName = Boolean(sample.scientificName?.trim())
+      const value = hasName ? String(sample.taxId) : UNKNOWN_SPECIES
+      const name = hasName ? sample.scientificName!.trim() : 'Unknown species'
+      const existing = speciesMap.get(value)
 
       if (existing) {
         existing.count++
       } else {
-        speciesMap.set(sample.taxId, {
-          taxId: sample.taxId,
-          name: sample.scientificName ?? 'Unknown species',
+        speciesMap.set(value, {
+          value,
+          taxId: sample.taxId ?? null,
+          name,
           count: 1,
         })
       }
@@ -80,21 +93,92 @@ function RouteComponent() {
     const organizationMap = new Map<string, number>()
 
     for (const sample of samples) {
-      const organization =
-        sample.dataOwningOrganization ?? 'Unknown organization'
+      const value = sample.dataOwningOrganization?.trim()
+        ? sample.dataOwningOrganization
+        : UNKNOWN_ORGANIZATION
 
-      organizationMap.set(
-        organization,
-        (organizationMap.get(organization) ?? 0) + 1,
-      )
+      organizationMap.set(value, (organizationMap.get(value) ?? 0) + 1)
     }
 
     return Array.from(organizationMap.entries())
-      .map(([name, count]) => ({ name, count }))
+      .map(([value, count]) => ({
+        value,
+        name: value === UNKNOWN_ORGANIZATION ? 'Unknown organization' : value,
+        count,
+      }))
       .sort((a, b) => a.name.localeCompare(b.name))
   }, [samples])
 
-  const selectedTaxIds = (search.species ?? [])
+  const hostOptions = useMemo(() => {
+    const counts = new Map<string, number>()
+
+    for (const sample of samples) {
+      const host = sample.hostScientificName?.trim()
+      const value = host || UNKNOWN_HOST
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+
+    return Array.from(counts.entries())
+      .map(([value, count]) => ({
+        value,
+        name: value === UNKNOWN_HOST ? 'Unknown host' : value,
+        count,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [samples])
+
+  const collectionYearOptions = useMemo(() => {
+    const counts = new Map<string, number>()
+
+    for (const sample of samples) {
+      const value =
+        sample.collectionYear == null
+          ? UNKNOWN_YEAR
+          : String(sample.collectionYear)
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+
+    return Array.from(counts.entries())
+      .map(([value, count]) => ({
+        value,
+        name: value === UNKNOWN_YEAR ? 'Unknown year' : value,
+        count,
+      }))
+      .sort((a, b) => {
+        if (a.value === UNKNOWN_YEAR) return 1
+        if (b.value === UNKNOWN_YEAR) return -1
+        return Number(b.value) - Number(a.value)
+      })
+  }, [samples])
+
+  const isolationSourceOptions = useMemo(() => {
+    const counts = new Map<string, number>()
+
+    for (const sample of samples) {
+      const source = sample.isolationSource?.trim()
+      const value = source || UNKNOWN_ISOLATION_SOURCE
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+
+    return Array.from(counts.entries())
+      .map(([value, count]) => ({
+        value,
+        name:
+          value === UNKNOWN_ISOLATION_SOURCE
+            ? 'Unknown isolation source'
+            : value,
+        count,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [samples])
+
+  const selectedSpecies = search.species ?? []
+  const selectedHosts = search.host ?? []
+  const selectedYears = search.collectionYear ?? []
+  const selectedSources = search.isolationSource ?? []
+
+  const selectedTaxIds = selectedSpecies
+    .filter((value) => value !== UNKNOWN_SPECIES)
     .map(Number)
     .filter(Number.isFinite)
 
@@ -103,15 +187,25 @@ function RouteComponent() {
     const organization = search.organization
 
     return samples.filter((sample) => {
-      const scientificName = (sample.scientificName ?? '').toLowerCase()
-      const dataOwner = (sample.dataOwningOrganization ?? '').toLowerCase()
+      const scientificName = (
+        sample.scientificName?.trim() || 'Unknown species'
+      ).toLowerCase()
+      const dataOwner = (
+        sample.dataOwningOrganization?.trim() || 'Unknown organization'
+      ).toLowerCase()
       const sampleId = (sample.id ?? '').toLowerCase()
       const taxId = String(sample.taxId ?? '')
-
-      const hostScientificName = (sample.hostScientificName ?? '').toLowerCase()
+      const hostScientificName = (
+        sample.hostScientificName?.trim() || 'Unknown host'
+      ).toLowerCase()
       const hostTaxId = String(sample.hostTaxId ?? '')
-      const collectionYear = String(sample.collectionYear ?? '')
-      const isolationSource = (sample.isolationSource ?? '').toLowerCase()
+      const collectionYear =
+        sample.collectionYear == null
+          ? 'Unknown year'
+          : String(sample.collectionYear)
+      const isolationSource = (
+        sample.isolationSource?.trim() || 'Unknown isolation source'
+      ).toLowerCase()
 
       const matchesQuery =
         !query ||
@@ -121,54 +215,131 @@ function RouteComponent() {
         taxId.includes(query) ||
         hostScientificName.includes(query) ||
         hostTaxId.includes(query) ||
-        collectionYear.includes(query) ||
-        isolationSource.includes(query)
+        collectionYear.toLowerCase().includes(query) ||
+        isolationSource.includes(query) ||
+        (['unknown', 'ukn'].includes(query) &&
+          (!sample.scientificName?.trim() ||
+            !sample.dataOwningOrganization?.trim() ||
+            !sample.hostScientificName?.trim() ||
+            sample.collectionYear == null ||
+            !sample.isolationSource?.trim()))
 
       const matchesSpecies =
-        selectedTaxIds.length === 0 || selectedTaxIds.includes(sample.taxId)
+        selectedSpecies.length === 0 ||
+        (selectedSpecies.includes(UNKNOWN_SPECIES) &&
+          !sample.scientificName?.trim()) ||
+        (Boolean(sample.scientificName?.trim()) &&
+          selectedTaxIds.includes(sample.taxId))
 
-      // Preserve the distinction between UiT and Uit.
       const matchesOrganization =
-        !organization || sample.dataOwningOrganization === organization
+        !organization ||
+        (organization === UNKNOWN_ORGANIZATION
+          ? !sample.dataOwningOrganization?.trim()
+          : sample.dataOwningOrganization === organization)
 
-      return matchesQuery && matchesSpecies && matchesOrganization
+      const hostValue = sample.hostScientificName?.trim()
+
+      const matchesHost =
+        selectedHosts.length === 0 ||
+        (selectedHosts.includes(UNKNOWN_HOST) && !hostValue) ||
+        (typeof hostValue === 'string' && selectedHosts.includes(hostValue))
+
+      const yearValue =
+        sample.collectionYear == null
+          ? UNKNOWN_YEAR
+          : String(sample.collectionYear)
+      const matchesYear =
+        selectedYears.length === 0 || selectedYears.includes(yearValue)
+
+      const sourceValue = sample.isolationSource?.trim()
+      const matchesIsolationSource =
+        selectedSources.length === 0 ||
+        (selectedSources.includes(UNKNOWN_ISOLATION_SOURCE) && !sourceValue) ||
+        (typeof sourceValue === 'string' &&
+          selectedSources.includes(sourceValue))
+
+      return (
+        matchesQuery &&
+        matchesSpecies &&
+        matchesOrganization &&
+        matchesHost &&
+        matchesYear &&
+        matchesIsolationSource
+      )
     })
-  }, [samples, search.query, search.species, search.organization])
+  }, [
+    samples,
+    search.query,
+    search.organization,
+    selectedSpecies,
+    selectedTaxIds,
+    selectedHosts,
+    selectedYears,
+    selectedSources,
+  ])
 
   const activeSpecies = speciesOptions.filter((species) =>
-    selectedTaxIds.includes(species.taxId),
+    selectedSpecies.includes(species.value),
+  )
+  const activeHosts = hostOptions.filter((host) =>
+    selectedHosts.includes(host.value),
+  )
+  const activeYears = collectionYearOptions.filter((year) =>
+    selectedYears.includes(year.value),
+  )
+  const activeSources = isolationSourceOptions.filter((source) =>
+    selectedSources.includes(source.value),
+  )
+  const activeOrganization = organizationOptions.find(
+    (item) => item.value === search.organization,
   )
 
   const hasActiveFilters =
     Boolean(search.query?.trim()) ||
-    selectedTaxIds.length > 0 ||
-    Boolean(search.organization)
+    selectedSpecies.length > 0 ||
+    Boolean(search.organization) ||
+    selectedHosts.length > 0 ||
+    selectedYears.length > 0 ||
+    selectedSources.length > 0
 
   function updateFilters(filters: {
     query?: string
     species?: string[]
     organization?: string
+    host?: string[]
+    collectionYear?: string[]
+    isolationSource?: string[]
   }) {
     navigate({
       search: {
         query: filters.query,
         species: filters.species ?? [],
         organization: filters.organization,
+        host: filters.host ?? [],
+        collectionYear: filters.collectionYear ?? [],
+        isolationSource: filters.isolationSource ?? [],
       },
     })
   }
 
-  function toggleSpecies(taxId: number, checked: boolean) {
-    const current = search.species ?? []
-
+  function toggleArrayFilter(
+    key: 'species' | 'host' | 'collectionYear' | 'isolationSource',
+    value: string,
+    checked: boolean,
+  ) {
+    const current = search[key] ?? []
     const next = checked
-      ? [...new Set([...current, String(taxId)])]
-      : current.filter((id) => Number(id) !== taxId)
+      ? [...new Set([...current, value])]
+      : current.filter((item) => item !== value)
 
     updateFilters({
       query: search.query,
-      species: next,
+      species: key === 'species' ? next : search.species,
       organization: search.organization,
+      host: key === 'host' ? next : search.host,
+      collectionYear: key === 'collectionYear' ? next : search.collectionYear,
+      isolationSource:
+        key === 'isolationSource' ? next : search.isolationSource,
     })
   }
 
@@ -178,14 +349,21 @@ function RouteComponent() {
       species: search.species,
       organization:
         search.organization === organization ? undefined : organization,
+      host: search.host,
+      collectionYear: search.collectionYear,
+      isolationSource: search.isolationSource,
     })
   }
 
   function clearFilters() {
+    setSearchInput('')
     updateFilters({
       query: undefined,
       species: [],
       organization: undefined,
+      host: [],
+      collectionYear: [],
+      isolationSource: [],
     })
   }
 
@@ -242,12 +420,13 @@ function RouteComponent() {
                 <form
                   onSubmit={(event) => {
                     event.preventDefault()
-
-                    navigate({
-                      search: (previous) => ({
-                        ...previous,
-                        query: searchInput.trim() || undefined,
-                      }),
+                    updateFilters({
+                      query: searchInput.trim() || undefined,
+                      species: search.species,
+                      organization: search.organization,
+                      host: search.host,
+                      collectionYear: search.collectionYear,
+                      isolationSource: search.isolationSource,
                     })
                   }}
                   className="space-y-2"
@@ -259,7 +438,7 @@ function RouteComponent() {
                       value={searchInput}
                       onChange={(event) => setSearchInput(event.target.value)}
                       placeholder="Search samples..."
-                      className="border-white/30 bg-white text-gray-900 placeholder:text-gray-500 pl-9"
+                      className="border-white/30 bg-white pl-9 text-gray-900 placeholder:text-gray-500"
                     />
                   </div>
 
@@ -275,7 +454,6 @@ function RouteComponent() {
 
             <SidebarSeparator />
 
-            {/* Active filters */}
             {hasActiveFilters && (
               <>
                 <SidebarGroup>
@@ -293,7 +471,6 @@ function RouteComponent() {
                           <span className="break-all">
                             Search: {search.query}
                           </span>
-
                           <button
                             type="button"
                             aria-label="Remove text search"
@@ -302,6 +479,9 @@ function RouteComponent() {
                                 query: undefined,
                                 species: search.species,
                                 organization: search.organization,
+                                host: search.host,
+                                collectionYear: search.collectionYear,
+                                isolationSource: search.isolationSource,
                               })
                             }
                           >
@@ -312,46 +492,108 @@ function RouteComponent() {
 
                       {activeSpecies.map((species) => (
                         <Badge
-                          key={species.taxId}
+                          key={species.value}
                           variant="secondary"
                           className="max-w-full gap-1 py-1"
                         >
                           <span className="break-words">
-                            {species.name} ({species.taxId})
+                            {species.name}
+                            {species.taxId != null ? ` (${species.taxId})` : ''}
                           </span>
-
                           <button
                             type="button"
                             aria-label={`Remove ${species.name} filter`}
-                            onClick={() => toggleSpecies(species.taxId, false)}
+                            onClick={() =>
+                              toggleArrayFilter('species', species.value, false)
+                            }
                           >
                             <X className="size-3 shrink-0" />
                           </button>
                         </Badge>
                       ))}
 
-                      {search.organization && (
+                      {activeOrganization && (
                         <Badge
                           variant="secondary"
                           className="max-w-full gap-1 py-1"
                         >
-                          {search.organization}
-
+                          {activeOrganization.name}
                           <button
                             type="button"
                             aria-label="Remove organization filter"
                             onClick={() =>
-                              updateFilters({
-                                query: search.query,
-                                species: search.species,
-                                organization: undefined,
-                              })
+                              selectOrganization(activeOrganization.value)
                             }
                           >
                             <X className="size-3 shrink-0" />
                           </button>
                         </Badge>
                       )}
+
+                      {activeHosts.map((host) => (
+                        <Badge
+                          key={host.value}
+                          variant="secondary"
+                          className="max-w-full gap-1 py-1"
+                        >
+                          {host.name}
+                          <button
+                            type="button"
+                            aria-label={`Remove ${host.name} filter`}
+                            onClick={() =>
+                              toggleArrayFilter('host', host.value, false)
+                            }
+                          >
+                            <X className="size-3 shrink-0" />
+                          </button>
+                        </Badge>
+                      ))}
+
+                      {activeYears.map((year) => (
+                        <Badge
+                          key={year.value}
+                          variant="secondary"
+                          className="max-w-full gap-1 py-1"
+                        >
+                          {year.name}
+                          <button
+                            type="button"
+                            aria-label={`Remove ${year.name} filter`}
+                            onClick={() =>
+                              toggleArrayFilter(
+                                'collectionYear',
+                                year.value,
+                                false,
+                              )
+                            }
+                          >
+                            <X className="size-3 shrink-0" />
+                          </button>
+                        </Badge>
+                      ))}
+
+                      {activeSources.map((source) => (
+                        <Badge
+                          key={source.value}
+                          variant="secondary"
+                          className="max-w-full gap-1 py-1"
+                        >
+                          {source.name}
+                          <button
+                            type="button"
+                            aria-label={`Remove ${source.name} filter`}
+                            onClick={() =>
+                              toggleArrayFilter(
+                                'isolationSource',
+                                source.value,
+                                false,
+                              )
+                            }
+                          >
+                            <X className="size-3 shrink-0" />
+                          </button>
+                        </Badge>
+                      ))}
                     </div>
                   </SidebarGroupContent>
                 </SidebarGroup>
@@ -360,93 +602,202 @@ function RouteComponent() {
               </>
             )}
 
-            {/* Species filters */}
             <SidebarGroup>
               <SidebarGroupLabel className="text-secondary">
                 Species
               </SidebarGroupLabel>
-
               <SidebarGroupContent>
                 <p className="px-2 pb-3 text-xs text-muted-foreground">
                   Filter by scientific name
                 </p>
-
-                {speciesOptions.length === 0 ? (
-                  <p className="px-2 text-sm text-muted-foreground">
-                    No species available.
-                  </p>
-                ) : (
-                  <div className="max-h-96 space-y-3 overflow-y-auto px-2">
-                    {speciesOptions.map((species) => (
-                      <div
-                        key={species.taxId}
-                        className="flex items-start gap-2"
+                <div className="max-h-96 space-y-3 overflow-y-auto px-2">
+                  {speciesOptions.map((species) => (
+                    <div key={species.value} className="flex items-start gap-2">
+                      <Checkbox
+                        id={`species-${species.value}`}
+                        className="mt-0.5"
+                        checked={selectedSpecies.includes(species.value)}
+                        onCheckedChange={(checked) =>
+                          toggleArrayFilter(
+                            'species',
+                            species.value,
+                            checked === true,
+                          )
+                        }
+                      />
+                      <Label
+                        htmlFor={`species-${species.value}`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-start justify-between gap-2 font-normal"
                       >
-                        <Checkbox
-                          id={`species-${species.taxId}`}
-                          className="mt-0.5"
-                          checked={selectedTaxIds.includes(species.taxId)}
-                          onCheckedChange={(checked) =>
-                            toggleSpecies(species.taxId, checked === true)
-                          }
-                        />
-
-                        <Label
-                          htmlFor={`species-${species.taxId}`}
-                          className="flex min-w-0 flex-1 cursor-pointer items-start justify-between gap-2 font-normal"
-                        >
-                          <span className="min-w-0 break-words">
-                            <span className="italic">{species.name}</span>
-
+                        <span className="min-w-0 break-words">
+                          <span className="italic">{species.name}</span>
+                          {species.taxId != null && (
                             <span className="block text-xs text-muted-foreground">
                               Tax ID: {species.taxId}
                             </span>
-                          </span>
-
-                          <span className="text-xs tabular-nums text-muted-foreground">
-                            {species.count}
-                          </span>
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                          )}
+                        </span>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {species.count}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
 
             <SidebarSeparator />
 
-            {/* Organization filters */}
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-secondary">
+                Host scientific name
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <p className="px-2 pb-3 text-xs text-muted-foreground">
+                  Filter by host organism
+                </p>
+                <div className="max-h-64 space-y-3 overflow-y-auto px-2">
+                  {hostOptions.map((host) => (
+                    <div key={host.value} className="flex items-start gap-2">
+                      <Checkbox
+                        id={`host-${host.value}`}
+                        className="mt-0.5"
+                        checked={selectedHosts.includes(host.value)}
+                        onCheckedChange={(checked) =>
+                          toggleArrayFilter(
+                            'host',
+                            host.value,
+                            checked === true,
+                          )
+                        }
+                      />
+                      <Label
+                        htmlFor={`host-${host.value}`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-start justify-between gap-2 font-normal"
+                      >
+                        <span className="min-w-0 break-words">
+                          <span className="italic">{host.name}</span>
+                        </span>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {host.count}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarSeparator />
+
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-secondary">
+                Collection year
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <p className="px-2 pb-3 text-xs text-muted-foreground">
+                  Filter by collection year
+                </p>
+                <div className="max-h-64 space-y-3 overflow-y-auto px-2">
+                  {collectionYearOptions.map((year) => (
+                    <div key={year.value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`year-${year.value}`}
+                        checked={selectedYears.includes(year.value)}
+                        onCheckedChange={(checked) =>
+                          toggleArrayFilter(
+                            'collectionYear',
+                            year.value,
+                            checked === true,
+                          )
+                        }
+                      />
+                      <Label
+                        htmlFor={`year-${year.value}`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-2 font-normal"
+                      >
+                        <span className="break-words">{year.name}</span>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {year.count}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarSeparator />
+
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-secondary">
+                Isolation source
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <p className="px-2 pb-3 text-xs text-muted-foreground">
+                  Filter by isolation source
+                </p>
+                <div className="max-h-64 space-y-3 overflow-y-auto px-2">
+                  {isolationSourceOptions.map((source) => (
+                    <div key={source.value} className="flex items-start gap-2">
+                      <Checkbox
+                        id={`source-${source.value}`}
+                        className="mt-0.5"
+                        checked={selectedSources.includes(source.value)}
+                        onCheckedChange={(checked) =>
+                          toggleArrayFilter(
+                            'isolationSource',
+                            source.value,
+                            checked === true,
+                          )
+                        }
+                      />
+                      <Label
+                        htmlFor={`source-${source.value}`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-start justify-between gap-2 font-normal"
+                      >
+                        <span className="min-w-0 break-words">
+                          {source.name}
+                        </span>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {source.count}
+                        </span>
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarSeparator />
+
             <SidebarGroup>
               <SidebarGroupLabel className="text-secondary">
                 Data owner
               </SidebarGroupLabel>
-
               <SidebarGroupContent>
                 <p className="px-2 pb-3 text-xs text-muted-foreground">
                   Filter by organization
                 </p>
-
                 <div className="space-y-3 px-2">
-                  {organizationOptions.map((organization, index) => (
+                  {organizationOptions.map((organization) => (
                     <div
-                      key={`${organization.name}-${index}`}
+                      key={organization.value}
                       className="flex items-center gap-2"
                     >
                       <Checkbox
-                        id={`organization-${index}`}
-                        checked={search.organization === organization.name}
+                        id={`organization-${organization.value}`}
+                        checked={search.organization === organization.value}
                         onCheckedChange={() =>
-                          selectOrganization(organization.name)
+                          selectOrganization(organization.value)
                         }
                       />
-
                       <Label
-                        htmlFor={`organization-${index}`}
+                        htmlFor={`organization-${organization.value}`}
                         className="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-2 font-normal"
                       >
                         <span className="break-words">{organization.name}</span>
-
                         <span className="text-xs tabular-nums text-muted-foreground">
                           {organization.count}
                         </span>
@@ -459,11 +810,9 @@ function RouteComponent() {
           </SidebarContent>
         </Sidebar>
 
-        {/* Main results area */}
         <SidebarInset className="min-w-0">
           <header className="flex h-14 shrink-0 items-center gap-3 border-b px-4">
             <SidebarTrigger />
-
             <div className="min-w-0">
               <p className="font-semibold">Search Results</p>
               <p className="text-xs text-muted-foreground">
@@ -477,28 +826,23 @@ function RouteComponent() {
               <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <div className="space-y-1">
                   <CardTitle className="text-lg">Microbial Samples</CardTitle>
-
                   <p className="text-sm text-muted-foreground">
                     Browse the available public samples.
                   </p>
                 </div>
-
                 {hasActiveFilters && (
                   <Button variant="outline" size="sm" onClick={clearFilters}>
                     Clear filters
                   </Button>
                 )}
               </CardHeader>
-
               <CardContent>
                 {filteredSamples.length === 0 ? (
                   <div className="py-12 text-center text-muted-foreground">
                     <p className="font-medium">No samples found</p>
-
                     <p className="mt-1 text-sm">
                       Try removing some filters to see more results.
                     </p>
-
                     {hasActiveFilters && (
                       <Button
                         variant="outline"
