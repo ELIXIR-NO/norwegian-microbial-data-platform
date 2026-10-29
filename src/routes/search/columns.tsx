@@ -6,7 +6,9 @@ export const columns: ColumnDef<Sample, unknown>[] = [
     accessorKey: 'scientificName',
     header: 'Scientific name',
     cell: ({ row }) => (
-      <span className="italic">{row.original.scientificName ?? '—'}</span>
+      <span className="italic">
+        {row.original.scientificName ?? 'Unknown species'}
+      </span>
     ),
   },
   {
@@ -37,6 +39,7 @@ export const columns: ColumnDef<Sample, unknown>[] = [
   {
     accessorKey: 'dataOwningOrganization',
     header: 'Data owner',
-    cell: ({ row }) => row.original.dataOwningOrganization ?? '—',
+    cell: ({ row }) =>
+      row.original.dataOwningOrganization ?? 'Unknown organization',
   },
 ]
