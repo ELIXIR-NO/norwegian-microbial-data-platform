@@ -7,6 +7,8 @@ import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { QueryProvider } from './providers/query-provider.tsx'
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 
 // Create a new router instance
 const router = createRouter({
@@ -31,7 +33,11 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <TooltipProvider>
+        <QueryProvider>
+          <RouterProvider router={router} />
+        </QueryProvider>
+      </TooltipProvider>
     </StrictMode>,
   )
 }
