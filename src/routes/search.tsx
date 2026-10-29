@@ -31,6 +31,7 @@ const UNKNOWN_ORGANIZATION = '__unknown_organization__'
 const UNKNOWN_HOST = '__unknown_host__'
 const UNKNOWN_YEAR = '__unknown_year__'
 const UNKNOWN_ISOLATION_SOURCE = '__unknown_isolation_source__'
+const EMPTY_FILTER_VALUES: string[] = []
 
 export const Route = createFileRoute('/search')({
   component: RouteComponent,
@@ -43,6 +44,119 @@ export const Route = createFileRoute('/search')({
     isolationSource: z.array(z.string()).optional(),
   }),
 })
+
+type FilterKey =
+  | 'species'
+  | 'organization'
+  | 'host'
+  | 'collectionYear'
+  | 'isolationSource'
+
+type PublicSample = Awaited<ReturnType<typeof fetchAllSamples>>[number]
+
+type SearchFilters = {
+  query?: string
+  species: string[]
+  organization?: string
+  host: string[]
+  collectionYear: string[]
+  isolationSource: string[]
+}
+
+function matchesSampleFilters(
+  sample: PublicSample,
+  filters: SearchFilters,
+  excludedFilter?: FilterKey,
+) {
+  const query = filters.query?.trim().toLowerCase()
+  const scientificName = (
+    sample.scientificName?.trim() || 'Unknown species'
+  ).toLowerCase()
+  const dataOwner = (
+    sample.dataOwningOrganization?.trim() || 'Unknown organization'
+  ).toLowerCase()
+  const sampleId = (sample.id ?? '').toLowerCase()
+  const taxId = String(sample.taxId ?? '')
+  const hostScientificName = (
+    sample.hostScientificName?.trim() || 'Unknown host'
+  ).toLowerCase()
+  const hostTaxId = String(sample.hostTaxId ?? '')
+  const collectionYear =
+    sample.collectionYear == null
+      ? 'Unknown year'
+      : String(sample.collectionYear)
+  const isolationSource = (
+    sample.isolationSource?.trim() || 'Unknown isolation source'
+  ).toLowerCase()
+
+  const matchesQuery =
+    !query ||
+    scientificName.includes(query) ||
+    dataOwner.includes(query) ||
+    sampleId.includes(query) ||
+    taxId.includes(query) ||
+    hostScientificName.includes(query) ||
+    hostTaxId.includes(query) ||
+    collectionYear.toLowerCase().includes(query) ||
+    isolationSource.includes(query) ||
+    (['unknown', 'ukn'].includes(query) &&
+      (!sample.scientificName?.trim() ||
+        !sample.dataOwningOrganization?.trim() ||
+        !sample.hostScientificName?.trim() ||
+        sample.collectionYear == null ||
+        !sample.isolationSource?.trim()))
+
+  const matchesSpecies =
+    excludedFilter === 'species' ||
+    filters.species.length === 0 ||
+    (filters.species.includes(UNKNOWN_SPECIES) &&
+      !sample.scientificName?.trim()) ||
+    (Boolean(sample.scientificName?.trim()) &&
+      filters.species
+        .filter((value) => value !== UNKNOWN_SPECIES)
+        .map(Number)
+        .filter(Number.isFinite)
+        .includes(sample.taxId))
+
+  const matchesOrganization =
+    excludedFilter === 'organization' ||
+    !filters.organization ||
+    (filters.organization === UNKNOWN_ORGANIZATION
+      ? !sample.dataOwningOrganization?.trim()
+      : sample.dataOwningOrganization === filters.organization)
+
+  const hostValue = sample.hostScientificName?.trim()
+  const matchesHost =
+    excludedFilter === 'host' ||
+    filters.host.length === 0 ||
+    (filters.host.includes(UNKNOWN_HOST) && !hostValue) ||
+    (typeof hostValue === 'string' && filters.host.includes(hostValue))
+
+  const yearValue =
+    sample.collectionYear == null ? UNKNOWN_YEAR : String(sample.collectionYear)
+  const matchesYear =
+    excludedFilter === 'collectionYear' ||
+    filters.collectionYear.length === 0 ||
+    filters.collectionYear.includes(yearValue)
+
+  const sourceValue = sample.isolationSource?.trim()
+  const matchesIsolationSource =
+    excludedFilter === 'isolationSource' ||
+    filters.isolationSource.length === 0 ||
+    (filters.isolationSource.includes(UNKNOWN_ISOLATION_SOURCE) &&
+      !sourceValue) ||
+    (typeof sourceValue === 'string' &&
+      filters.isolationSource.includes(sourceValue))
+
+  return (
+    matchesQuery &&
+    matchesSpecies &&
+    matchesOrganization &&
+    matchesHost &&
+    matchesYear &&
+    matchesIsolationSource
+  )
+}
 
 function RouteComponent() {
   const search = Route.useSearch()
@@ -60,77 +174,147 @@ function RouteComponent() {
     staleTime: 60_000,
   })
 
+  const selectedSpecies = search.species ?? EMPTY_FILTER_VALUES
+  const selectedHosts = search.host ?? EMPTY_FILTER_VALUES
+  const selectedYears = search.collectionYear ?? EMPTY_FILTER_VALUES
+  const selectedSources = search.isolationSource ?? EMPTY_FILTER_VALUES
+
+  const currentFilters = useMemo<SearchFilters>(
+    () => ({
+      query: search.query,
+      species: selectedSpecies,
+      organization: search.organization,
+      host: selectedHosts,
+      collectionYear: selectedYears,
+      isolationSource: selectedSources,
+    }),
+    [
+      search.query,
+      search.organization,
+      selectedSpecies,
+      selectedHosts,
+      selectedYears,
+      selectedSources,
+    ],
+  )
+
+  // Each facet counts samples matching every active filter except its own.
+  // Keep selected options visible even if their count becomes zero.
   const speciesOptions = useMemo(() => {
-    const speciesMap = new Map<
+    const allOptions = new Map<
       string,
-      { value: string; taxId: number | null; name: string; count: number }
+      { value: string; taxId: number | null; name: string }
     >()
+    const counts = new Map<string, number>()
+    const facetSamples = samples.filter((sample) =>
+      matchesSampleFilters(sample, currentFilters, 'species'),
+    )
 
     for (const sample of samples) {
       const hasName = Boolean(sample.scientificName?.trim())
       const value = hasName ? String(sample.taxId) : UNKNOWN_SPECIES
-      const name = hasName ? sample.scientificName!.trim() : 'Unknown species'
-      const existing = speciesMap.get(value)
-
-      if (existing) {
-        existing.count++
-      } else {
-        speciesMap.set(value, {
+      if (!allOptions.has(value)) {
+        allOptions.set(value, {
           value,
-          taxId: sample.taxId ?? null,
-          name,
-          count: 1,
+          taxId: hasName ? (sample.taxId ?? null) : null,
+          name: hasName ? sample.scientificName!.trim() : 'Unknown species',
         })
       }
     }
 
-    return Array.from(speciesMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    )
-  }, [samples])
-
-  const organizationOptions = useMemo(() => {
-    const organizationMap = new Map<string, number>()
-
-    for (const sample of samples) {
-      const value = sample.dataOwningOrganization?.trim()
-        ? sample.dataOwningOrganization
-        : UNKNOWN_ORGANIZATION
-
-      organizationMap.set(value, (organizationMap.get(value) ?? 0) + 1)
-    }
-
-    return Array.from(organizationMap.entries())
-      .map(([value, count]) => ({
-        value,
-        name: value === UNKNOWN_ORGANIZATION ? 'Unknown organization' : value,
-        count,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name))
-  }, [samples])
-
-  const hostOptions = useMemo(() => {
-    const counts = new Map<string, number>()
-
-    for (const sample of samples) {
-      const host = sample.hostScientificName?.trim()
-      const value = host || UNKNOWN_HOST
+    for (const sample of facetSamples) {
+      const value = sample.scientificName?.trim()
+        ? String(sample.taxId)
+        : UNKNOWN_SPECIES
       counts.set(value, (counts.get(value) ?? 0) + 1)
     }
 
-    return Array.from(counts.entries())
-      .map(([value, count]) => ({
-        value,
-        name: value === UNKNOWN_HOST ? 'Unknown host' : value,
-        count,
-      }))
+    return Array.from(allOptions.values())
+      .map((option) => ({ ...option, count: counts.get(option.value) ?? 0 }))
+      .filter(
+        (option) => option.count > 0 || selectedSpecies.includes(option.value),
+      )
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [samples])
+  }, [samples, currentFilters, selectedSpecies])
 
-  const collectionYearOptions = useMemo(() => {
+  const organizationOptions = useMemo(() => {
+    const allOptions = new Set<string>()
     const counts = new Map<string, number>()
+    const facetSamples = samples.filter((sample) =>
+      matchesSampleFilters(sample, currentFilters, 'organization'),
+    )
 
     for (const sample of samples) {
+      allOptions.add(
+        sample.dataOwningOrganization?.trim()
+          ? sample.dataOwningOrganization
+          : UNKNOWN_ORGANIZATION,
+      )
+    }
+
+    for (const sample of facetSamples) {
+      const value = sample.dataOwningOrganization?.trim()
+        ? sample.dataOwningOrganization
+        : UNKNOWN_ORGANIZATION
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+
+    return Array.from(allOptions)
+      .map((value) => ({
+        value,
+        name: value === UNKNOWN_ORGANIZATION ? 'Unknown organization' : value,
+        count: counts.get(value) ?? 0,
+      }))
+      .filter(
+        (option) => option.count > 0 || option.value === search.organization,
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [samples, currentFilters, search.organization])
+
+  const hostOptions = useMemo(() => {
+    const allOptions = new Set<string>()
+    const counts = new Map<string, number>()
+    const facetSamples = samples.filter((sample) =>
+      matchesSampleFilters(sample, currentFilters, 'host'),
+    )
+
+    for (const sample of samples) {
+      allOptions.add(sample.hostScientificName?.trim() || UNKNOWN_HOST)
+    }
+
+    for (const sample of facetSamples) {
+      const value = sample.hostScientificName?.trim() || UNKNOWN_HOST
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+
+    return Array.from(allOptions)
+      .map((value) => ({
+        value,
+        name: value === UNKNOWN_HOST ? 'Unknown host' : value,
+        count: counts.get(value) ?? 0,
+      }))
+      .filter(
+        (option) => option.count > 0 || selectedHosts.includes(option.value),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [samples, currentFilters, selectedHosts])
+
+  const collectionYearOptions = useMemo(() => {
+    const allOptions = new Set<string>()
+    const counts = new Map<string, number>()
+    const facetSamples = samples.filter((sample) =>
+      matchesSampleFilters(sample, currentFilters, 'collectionYear'),
+    )
+
+    for (const sample of samples) {
+      allOptions.add(
+        sample.collectionYear == null
+          ? UNKNOWN_YEAR
+          : String(sample.collectionYear),
+      )
+    }
+
+    for (const sample of facetSamples) {
       const value =
         sample.collectionYear == null
           ? UNKNOWN_YEAR
@@ -138,145 +322,58 @@ function RouteComponent() {
       counts.set(value, (counts.get(value) ?? 0) + 1)
     }
 
-    return Array.from(counts.entries())
-      .map(([value, count]) => ({
+    return Array.from(allOptions)
+      .map((value) => ({
         value,
         name: value === UNKNOWN_YEAR ? 'Unknown year' : value,
-        count,
+        count: counts.get(value) ?? 0,
       }))
+      .filter(
+        (option) => option.count > 0 || selectedYears.includes(option.value),
+      )
       .sort((a, b) => {
         if (a.value === UNKNOWN_YEAR) return 1
         if (b.value === UNKNOWN_YEAR) return -1
         return Number(b.value) - Number(a.value)
       })
-  }, [samples])
+  }, [samples, currentFilters, selectedYears])
 
   const isolationSourceOptions = useMemo(() => {
+    const allOptions = new Set<string>()
     const counts = new Map<string, number>()
+    const facetSamples = samples.filter((sample) =>
+      matchesSampleFilters(sample, currentFilters, 'isolationSource'),
+    )
 
     for (const sample of samples) {
-      const source = sample.isolationSource?.trim()
-      const value = source || UNKNOWN_ISOLATION_SOURCE
+      allOptions.add(sample.isolationSource?.trim() || UNKNOWN_ISOLATION_SOURCE)
+    }
+
+    for (const sample of facetSamples) {
+      const value = sample.isolationSource?.trim() || UNKNOWN_ISOLATION_SOURCE
       counts.set(value, (counts.get(value) ?? 0) + 1)
     }
 
-    return Array.from(counts.entries())
-      .map(([value, count]) => ({
+    return Array.from(allOptions)
+      .map((value) => ({
         value,
         name:
           value === UNKNOWN_ISOLATION_SOURCE
             ? 'Unknown isolation source'
             : value,
-        count,
+        count: counts.get(value) ?? 0,
       }))
-      .sort((a, b) => a.name.localeCompare(b.name))
-  }, [samples])
-
-  const selectedSpecies = search.species ?? []
-  const selectedHosts = search.host ?? []
-  const selectedYears = search.collectionYear ?? []
-  const selectedSources = search.isolationSource ?? []
-
-  const selectedTaxIds = selectedSpecies
-    .filter((value) => value !== UNKNOWN_SPECIES)
-    .map(Number)
-    .filter(Number.isFinite)
-
-  const filteredSamples = useMemo(() => {
-    const query = search.query?.trim().toLowerCase()
-    const organization = search.organization
-
-    return samples.filter((sample) => {
-      const scientificName = (
-        sample.scientificName?.trim() || 'Unknown species'
-      ).toLowerCase()
-      const dataOwner = (
-        sample.dataOwningOrganization?.trim() || 'Unknown organization'
-      ).toLowerCase()
-      const sampleId = (sample.id ?? '').toLowerCase()
-      const taxId = String(sample.taxId ?? '')
-      const hostScientificName = (
-        sample.hostScientificName?.trim() || 'Unknown host'
-      ).toLowerCase()
-      const hostTaxId = String(sample.hostTaxId ?? '')
-      const collectionYear =
-        sample.collectionYear == null
-          ? 'Unknown year'
-          : String(sample.collectionYear)
-      const isolationSource = (
-        sample.isolationSource?.trim() || 'Unknown isolation source'
-      ).toLowerCase()
-
-      const matchesQuery =
-        !query ||
-        scientificName.includes(query) ||
-        dataOwner.includes(query) ||
-        sampleId.includes(query) ||
-        taxId.includes(query) ||
-        hostScientificName.includes(query) ||
-        hostTaxId.includes(query) ||
-        collectionYear.toLowerCase().includes(query) ||
-        isolationSource.includes(query) ||
-        (['unknown', 'ukn'].includes(query) &&
-          (!sample.scientificName?.trim() ||
-            !sample.dataOwningOrganization?.trim() ||
-            !sample.hostScientificName?.trim() ||
-            sample.collectionYear == null ||
-            !sample.isolationSource?.trim()))
-
-      const matchesSpecies =
-        selectedSpecies.length === 0 ||
-        (selectedSpecies.includes(UNKNOWN_SPECIES) &&
-          !sample.scientificName?.trim()) ||
-        (Boolean(sample.scientificName?.trim()) &&
-          selectedTaxIds.includes(sample.taxId))
-
-      const matchesOrganization =
-        !organization ||
-        (organization === UNKNOWN_ORGANIZATION
-          ? !sample.dataOwningOrganization?.trim()
-          : sample.dataOwningOrganization === organization)
-
-      const hostValue = sample.hostScientificName?.trim()
-
-      const matchesHost =
-        selectedHosts.length === 0 ||
-        (selectedHosts.includes(UNKNOWN_HOST) && !hostValue) ||
-        (typeof hostValue === 'string' && selectedHosts.includes(hostValue))
-
-      const yearValue =
-        sample.collectionYear == null
-          ? UNKNOWN_YEAR
-          : String(sample.collectionYear)
-      const matchesYear =
-        selectedYears.length === 0 || selectedYears.includes(yearValue)
-
-      const sourceValue = sample.isolationSource?.trim()
-      const matchesIsolationSource =
-        selectedSources.length === 0 ||
-        (selectedSources.includes(UNKNOWN_ISOLATION_SOURCE) && !sourceValue) ||
-        (typeof sourceValue === 'string' &&
-          selectedSources.includes(sourceValue))
-
-      return (
-        matchesQuery &&
-        matchesSpecies &&
-        matchesOrganization &&
-        matchesHost &&
-        matchesYear &&
-        matchesIsolationSource
+      .filter(
+        (option) => option.count > 0 || selectedSources.includes(option.value),
       )
-    })
-  }, [
-    samples,
-    search.query,
-    search.organization,
-    selectedSpecies,
-    selectedTaxIds,
-    selectedHosts,
-    selectedYears,
-    selectedSources,
-  ])
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [samples, currentFilters, selectedSources])
+
+  const filteredSamples = useMemo(
+    () =>
+      samples.filter((sample) => matchesSampleFilters(sample, currentFilters)),
+    [samples, currentFilters],
+  )
 
   const activeSpecies = speciesOptions.filter((species) =>
     selectedSpecies.includes(species.value),
