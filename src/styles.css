@@ -45,6 +45,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-elixir-blue: #023452;
   --color-elixir-grey: #4d4848;
+  --color-elixir-orange: #f47d20;
+  --color-elixir-green: #bebf32;
 }
 
 :root {
