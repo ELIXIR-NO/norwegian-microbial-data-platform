@@ -67,7 +67,7 @@ const resources: Array<ResourcesGridData> = [
 
 function App() {
   return (
-    <div className="flex flex-col items-center space-y-8">
+    <div className="flex flex-col items-center">
       <section className="relative flex h-100 w-full items-center justify-center overflow-hidden">
         <div className="bg-elixir-blue absolute inset-0" />
 
@@ -92,8 +92,10 @@ function App() {
 
       <SearchData />
 
-      <CardGrid data={organism} />
-      <ResourcesGrid data={resources} />
+      <div className="flex flex-col items-center space-y-8 pt-8">
+        <CardGrid data={organism} />
+        <ResourcesGrid data={resources} />
+      </div>
     </div>
   )
 }
