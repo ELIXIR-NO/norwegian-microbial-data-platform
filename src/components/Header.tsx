@@ -38,12 +38,12 @@ export function Header() {
           </a>
           <Link to="/">
             <div className="flex flex-col justify-center">
-              <h1 className="animate-fade-in text-4xl font-bold lg:text-2xl">
-                Norwegian Microbial Data Platform
-              </h1>
-              <h4 className="animate-fade-in text-lg lg:text-base">
-                Manage, share and archive data
-              </h4>
+              <img
+                src={'/NMDP_logo_extend_03.svg'}
+                alt={'NMDP Logo'}
+                width={250}
+                height={50}
+              />
             </div>
           </Link>
         </div>
@@ -74,8 +74,11 @@ const NavBarItem: FC<NavItem> = ({ pageUrl, pageName }) => {
   return (
     <Button
       asChild
-      className={cn('text-md h-10 rounded-md px-4 has-[>svg]:px-4')}
-      variant={isActive ? 'default' : 'secondary'}
+      variant={'secondary'}
+      className={cn(
+        'text-md h-10 rounded-md px-4 has-[>svg]:px-4',
+        isActive ? 'bg-elixir-blue text-white hover:bg-elixir-blue/90' : '',
+      )}
     >
       <a href={pageUrl}>{pageName}</a>
     </Button>

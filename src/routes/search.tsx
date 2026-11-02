@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { X, SlidersHorizontal, Search } from 'lucide-react'
@@ -483,14 +483,39 @@ function RouteComponent() {
           collapsible="offcanvas"
           className="[&_[data-sidebar=sidebar]]:bg-elixir-blue [&_[data-sidebar=sidebar]]:text-white"
         >
-          <SidebarHeader>
-            <div className="px-2 py-2">
-              <h2 className="flex items-center gap-2 text-lg font-semibold text-white">
+          <SidebarHeader className="px-0 py-0">
+            <div className="gap-6">
+              <div className="flex items-center gap-4 bg-white px-4 py-2">
+                <Link to="/">
+                  <img
+                    src="/NMDP_logo_extend_03.svg"
+                    alt="NMDP Logo"
+                    width={200}
+                    height={50}
+                    className="h-[50px] w-auto"
+                  />
+                </Link>
+
+                <a
+                  href="https://elixir.no"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/elixir-no-logo-black.svg"
+                    alt="ELIXIR Norway Logo"
+                    width={150}
+                    height={50}
+                    className="h-[40px] w-auto"
+                  />
+                </a>
+              </div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-white px-4 pt-2">
                 <SlidersHorizontal className="size-5" />
                 Filters
               </h2>
 
-              <p className="mt-1 text-sm text-white/70">
+              <p className="mt-1 text-sm text-white/70 px-4">
                 {filteredSamples.length} of {samples.length} samples
               </p>
 
