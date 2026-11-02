@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Search, Info, SquareArrowOutUpRight } from 'lucide-react'
+import { Search, Info } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
@@ -12,7 +12,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Button } from './ui/button'
 
 export function SearchData() {
   const [query, setQuery] = useState('')
@@ -32,16 +31,6 @@ export function SearchData() {
 
   return (
     <section className="mx-auto w-full   bg-elixir-blue px-4  text-white sm:px-6 lg:py-16">
-      {/* Header */}
-      <header className=" text-center mb-2 max-w-5xl mx-auto">
-        <h3>Discover, manage and share Microbial Data</h3>
-
-        <p className="mx-auto max-w-full text-base leading-relaxed ">
-          A national platform for managing microbial datasets and metadata,
-          enabling discovery, access and reuse.
-        </p>
-      </header>
-
       {/* Search area */}
       <div className="space-y-4 max-w-5xl mx-auto">
         <div className="flex items-center gap-3">
@@ -107,18 +96,6 @@ export function SearchData() {
               </div>
             </TooltipContent>
           </Tooltip>
-        </div>
-
-        {/* Advanced Search */}
-        <div className="flex justify-center">
-          <Button
-            className="inline-flex items-center gap-2 text-base"
-            variant="secondary"
-            onClick={() => navigate({ to: '/search' })}
-          >
-            Advanced Search
-            <SquareArrowOutUpRight className="size-5" />
-          </Button>
         </div>
       </div>
     </section>

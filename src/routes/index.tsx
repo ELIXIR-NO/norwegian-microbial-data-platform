@@ -71,16 +71,14 @@ function App() {
       <section className="relative flex h-100 w-full items-center justify-center overflow-hidden">
         <div className="bg-elixir-blue absolute inset-0" />
 
-        {/* Estrutura em coluna */}
         <div className="z-10 flex h-full w-full flex-col justify-between px-6 py-6">
-          {/* Texto centralizado no meio da div */}
           <div className="flex flex-1 flex-col items-center justify-center text-center">
             <h1 className="animate-fade-in mb-4 text-4xl font-bold text-white lg:text-6xl">
-              Manage, Share and Archive Microbial Data
+              Discover, manage and share Microbial Data
             </h1>
             <h4 className="animate-fade-in text-lg text-gray-200 lg:text-2xl">
-              Simplifying metadata management, sample tracking and FAIR data
-              sharing.
+              A national platform for managing microbial datasets and metadata,
+              enabling discovery, access and reuse.
             </h4>
           </div>
 
