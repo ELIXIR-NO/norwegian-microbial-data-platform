@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardContent } from '../ui/card'
 
 const serves = [
   'Research institutions and universities',
