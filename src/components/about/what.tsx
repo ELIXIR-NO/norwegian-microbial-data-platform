@@ -8,53 +8,56 @@ interface CheckItemProps {
 
 const checkItems: Array<CheckItemProps> = [
   {
-    title: 'Secure data storage',
+    title: 'Discover unpublished data',
     description:
-      'Compliant with Norwegian and European regulations for handling sensitive and non-sensitive microbiological data.',
+      'Discover microbial datasets before formal publication through searchable metadata, facilitating early data discovery and research collaboration.',
   },
   {
     title: 'Rich metadata management',
     description:
-      'Tools to capture essential contextual information about samples, studies, and sequencing data.',
-  },
-  {
-    title: 'Federated discovery',
-    description:
-      'Users can find and explore relevant datasets without exposing the data itself, enabling collaboration and early discovery.',
-  },
-  {
-    title: 'Integration with national and European infrastructures',
-    description:
-      'Tools to capture essential contextual information about samples, studies, and sequencing data.',
+      'Organise, manage and enrich contextual metadata linked to microbial datasets throughout the research data lifecycle.',
   },
   {
     title: 'User-friendly interface',
     description:
-      'Designed for both expert bioinformaticians and applied researchers, with guided upload, annotation, and sharing workflows.',
+      'Easily register, manage and share datasets and associated metadata through an intuitive web-based interface.',
   },
   {
-    title: 'Long-term archiving and sustainability',
+    title: 'Standardised and FAIR data',
     description:
-      'Hosted on national e-infrastructures (e.g. NIRD) to ensure persistent access and reliable data stewardship.',
+      'Support FAIR data practices through structured metadata, international standards and integration with public data archives.',
+  },
+  {
+    title: 'Controlled data access',
+    description:
+      'Securely manage access to datasets and metadata through user authentication, permissions and controlled sharing.',
+  },
+  {
+    title: 'Support and training',
+    description:
+      'Access guidance, training and technical support through the ELIXIR Norway support desk.',
   },
 ]
 
 export default function What() {
   return (
     <>
-      <h4 className="max-w-6xl text-justify leading-relaxed lg:mx-auto lg:py-4 text-xl">
-        The <strong>Norwegian Microbial Data Platform (NMDP)</strong> is a
-        national initiative that provides a secure, user-friendly infrastructure
-        for
-        <strong>
-          storing, sharing, and archiving FAIR pathogen and infectious disease
-          data
-        </strong>{' '}
-        Its goal is to accelerate{' '}
-        <strong>research, innovation, and preparedness</strong> by making
-        high-quality microbial data easier to find, access, and reuse — while
-        ensuring that confidential information remains protected.
-      </h4>
+      <h3 className="max-w-6xl text-justify leading-relaxed lg:mx-auto lg:py-4 text-xl">
+        The <strong>Norwegian Microbial Data Platform (NMDP)</strong> provides a
+        national infrastructure for discovering, managing, sharing and reusing
+        microbial data. Through its integrated{' '}
+        <a
+          href="https://metatrack.no"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline"
+        >
+          MetaTrack
+        </a>{' '}
+        tool, researchers can manage datasets and contextual metadata,
+        collaborate across institutions and prepare data for publication in
+        public archives.
+      </h3>
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <h3 className="mb-4 text-center font-semibold text-xl">
