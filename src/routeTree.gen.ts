@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WhatsNextRouteImport } from './routes/whats-next'
 import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResourcesRouteImport } from './routes/resources'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactUsIndexRouteImport } from './routes/contact-us/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 
+const WhatsNextRoute = WhatsNextRouteImport.update({
+  id: '/whats-next',
+  path: '/whats-next',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
   id: '/terms-of-use',
   path: '/terms-of-use',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/whats-next': typeof WhatsNextRoute
   '/about': typeof AboutIndexRoute
   '/contact-us': typeof ContactUsIndexRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/whats-next': typeof WhatsNextRoute
   '/about': typeof AboutIndexRoute
   '/contact-us': typeof ContactUsIndexRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
   '/terms-of-use': typeof TermsOfUseRoute
+  '/whats-next': typeof WhatsNextRoute
   '/about/': typeof AboutIndexRoute
   '/contact-us/': typeof ContactUsIndexRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/search'
     | '/terms-of-use'
+    | '/whats-next'
     | '/about'
     | '/contact-us'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/search'
     | '/terms-of-use'
+    | '/whats-next'
     | '/about'
     | '/contact-us'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/search'
     | '/terms-of-use'
+    | '/whats-next'
     | '/about/'
     | '/contact-us/'
   fileRoutesById: FileRoutesById
@@ -143,12 +155,20 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   SearchRoute: typeof SearchRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
+  WhatsNextRoute: typeof WhatsNextRoute
   AboutIndexRoute: typeof AboutIndexRoute
   ContactUsIndexRoute: typeof ContactUsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/whats-next': {
+      id: '/whats-next'
+      path: '/whats-next'
+      fullPath: '/whats-next'
+      preLoaderRoute: typeof WhatsNextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms-of-use': {
       id: '/terms-of-use'
       path: '/terms-of-use'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   SearchRoute: SearchRoute,
   TermsOfUseRoute: TermsOfUseRoute,
+  WhatsNextRoute: WhatsNextRoute,
   AboutIndexRoute: AboutIndexRoute,
   ContactUsIndexRoute: ContactUsIndexRoute,
 }
