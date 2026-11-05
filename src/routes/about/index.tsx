@@ -16,7 +16,7 @@ export default function About() {
   return (
     <>
       <Suspense>
-        <Tabs defaultValue="what" className="py-25">
+        <Tabs defaultValue="what">
           <TabsList variant="underline">
             <TabsTrigger
               value="what"
