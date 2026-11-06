@@ -10,8 +10,9 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { GOOGLE_WEBAPP_URL_PD } from '@/lib/config'
 
-const GOOGLE_WEBAPP_URL = '/feedback'
+const GOOGLE_WEBAPP_URL = GOOGLE_WEBAPP_URL_PD
 
 export default function FeedbackButton() {
   const [feedback, setFeedback] = useState('')
