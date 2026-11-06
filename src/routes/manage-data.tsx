@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-export const Route = createFileRoute('/managed-data')({
+export const Route = createFileRoute('/manage-data')({
   component: ManagedData,
 })
 

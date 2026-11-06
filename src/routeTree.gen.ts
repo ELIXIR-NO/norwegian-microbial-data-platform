@@ -14,7 +14,7 @@ import { Route as TermsOfUseRouteImport } from './routes/terms-of-use'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as ManagedDataRouteImport } from './routes/managed-data'
+import { Route as ManageDataRouteImport } from './routes/manage-data'
 import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactUsIndexRouteImport } from './routes/contact-us/index'
@@ -45,9 +45,9 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ManagedDataRoute = ManagedDataRouteImport.update({
-  id: '/managed-data',
-  path: '/managed-data',
+const ManageDataRoute = ManageDataRouteImport.update({
+  id: '/manage-data',
+  path: '/manage-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GetStartedRoute = GetStartedRouteImport.update({
@@ -74,7 +74,7 @@ const AboutIndexRoute = AboutIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
-  '/managed-data': typeof ManagedDataRoute
+  '/manage-data': typeof ManageDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
@@ -86,7 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
-  '/managed-data': typeof ManagedDataRoute
+  '/manage-data': typeof ManageDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
@@ -99,7 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/get-started': typeof GetStartedRoute
-  '/managed-data': typeof ManagedDataRoute
+  '/manage-data': typeof ManageDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/resources': typeof ResourcesRoute
   '/search': typeof SearchRoute
@@ -113,7 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/get-started'
-    | '/managed-data'
+    | '/manage-data'
     | '/privacy-policy'
     | '/resources'
     | '/search'
@@ -125,7 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/get-started'
-    | '/managed-data'
+    | '/manage-data'
     | '/privacy-policy'
     | '/resources'
     | '/search'
@@ -137,7 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/get-started'
-    | '/managed-data'
+    | '/manage-data'
     | '/privacy-policy'
     | '/resources'
     | '/search'
@@ -150,7 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GetStartedRoute: typeof GetStartedRoute
-  ManagedDataRoute: typeof ManagedDataRoute
+  ManageDataRoute: typeof ManageDataRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ResourcesRoute: typeof ResourcesRoute
   SearchRoute: typeof SearchRoute
@@ -197,11 +197,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/managed-data': {
-      id: '/managed-data'
-      path: '/managed-data'
-      fullPath: '/managed-data'
-      preLoaderRoute: typeof ManagedDataRouteImport
+    '/manage-data': {
+      id: '/manage-data'
+      path: '/manage-data'
+      fullPath: '/manage-data'
+      preLoaderRoute: typeof ManageDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/get-started': {
@@ -238,7 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GetStartedRoute: GetStartedRoute,
-  ManagedDataRoute: ManagedDataRoute,
+  ManageDataRoute: ManageDataRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ResourcesRoute: ResourcesRoute,
   SearchRoute: SearchRoute,

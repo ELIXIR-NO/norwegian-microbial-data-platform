@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 type NavItem = { pageUrl: string; pageName: string }
 const NavItems: Array<NavItem> = [
   {
-    pageUrl: '/managed-data',
-    pageName: 'Managed Data',
+    pageUrl: '/manage-data',
+    pageName: 'Manage Data',
   },
   {
     pageUrl: '/about',
@@ -16,6 +16,10 @@ const NavItems: Array<NavItem> = [
   {
     pageUrl: '/get-started',
     pageName: 'Get Started',
+  },
+  {
+    pageUrl: '/whats-next',
+    pageName: "What's Next",
   },
   {
     pageUrl: '/contact-us',
@@ -80,7 +84,7 @@ const NavBarItem: FC<NavItem> = ({ pageUrl, pageName }) => {
         isActive ? 'bg-elixir-blue text-white hover:bg-elixir-blue/90' : '',
       )}
     >
-      <a href={pageUrl}>{pageName}</a>
+      <Link to={pageUrl}>{pageName}</Link>
     </Button>
   )
 }
